@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<center>
+	请输入城市：
+	<input type="text" id="city">
+	<br>
+	<div id="hchart" style="height: 400px;width:"></div>
+	</center>
+</body>
+</html>
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+<script>
+$("#city").blur(function(){
+
+	var city = $(this).val();
+	var hanzi = /^[A-Za-z0-9\u4e00-\u9fa5]+$/i;
+	if (city == ""|| city.length>30) {
+		alert("不能为空且长度不能大于30");
+		return false;
+	}
+	if (!hanzi.test(city)) {
+		alert("请输入汉字");
+		return false;
+	}
+	$.ajax({
+		url:"weather.php",
+		data:{city:city},
+		dataType:"json",
+		type:"post",
+		success:function(e){
+			var week = "";
+			var temp_high = "[";
+			var temp_low = "[";
+			$.each(e,function(i,v){
+				week+=v.week+",";
+				temp_high+=v.temp_high+",";
+				temp_low+=v.temp_low+",";
+			});
+			week = week.split(",");
+			temp_high+="]";
+			temp_low+="]";
+			var chart = Highcharts.chart('hchart', {
+			    chart: {
+			        type: 'line'
+			    },
+			    title: {
+			        text: '月平均气温'
+			    },
+			    xAxis: {
+			        categories:week
+			    },
+			    yAxis: {
+			        title: {
+			            text: '气温 (°C)'
+			        }
+			    },
+			    series: [{
+			        name: '最高温',
+			        data: eval(temp_high)
+			    }, {
+			        name: '最低温',
+			        data: eval(temp_low)
+			    }]
+			});
+		}
+	});
+});
+</script>
