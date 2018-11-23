@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>注册表单</title>
+</head>
+<body>
+	<center>
+ 	<table>
+	<tr>
+		<td>用户名</td>
+		<td><input type="text" id="name"></td>
+	</tr>
+	<tr>
+		<td>密码</td>
+		<td><input type="password" id="password"></td>
+	</tr>
+	<tr>
+		<td>手机号</td>
+		<td><input type="text" id="phone">	
+		<input type="button" id="send" value="发送验证码"></td>
+	</tr>
+	<tr>
+		<td>验证码</td>
+		<td><input type="text" id="code"></td>
+	</tr>
+	<tr>
+		<td><input type="submit" value="注册"></td>
+	</tr>
+ 	</table>
+	</center>
+</body>
+</html>
+<script src="jquery.js"></script>
+<script>
+$('#send').click(function(){
+	var phone = $("#phone").val();
+	if(phone==''){
+		alert("手机号不能为空");
+		return false;
+	}
+	$.ajax({
+		url:"SendTemplateSMS.php",
+		data:{phone:phone},
+		dataType:"json",
+		type:"post",
+		success:function(e){
+			alert("e.msg")
+		}
+	});
+});
+//注册时返回结果
+	$("#sub").click(function(){
+		var name = $("#name").val();
+		if (name=='') {
+			alert("用户名不能为空");
+			return false;
+		}
+		var password = $("#password").val();
+		if (password<8 || password.length>16) {
+			alert("密码8-16位");
+			return false;
+		}
+		val code = $('#code').val();
+		if (code =='') {
+			alert("请输入验证码");
+			return false;
+		}
+		var phone = $('#phone').val();
+		$.ajax({
+			url:"register.php",
+			data:{name:name,password:password,phone:phone,code:code},
+			dataType:"json",
+			type:"post",
+			success:function(e){
+				if (e.code=='0') {
+					alert(e.msg);
+					return false;
+				}
+				if (e.code=='1') {
+					alert(e.msg);
+					return false;
+			}else{
+				alert(e.msg);
+				location.href="login.php";
+			}
+		}
+		})
+	})
+</script>
